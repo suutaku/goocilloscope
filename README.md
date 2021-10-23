@@ -4,14 +4,15 @@
 
 
 ## Install
-```
+
+```bash
 go get github.com/suutaku/goosilloscope
 go build
 ```
 
 ## Usage
 As a tool:
-```
+```bash
 Usage: goocilloscope COMMAND [arg...]
 
 A simple ocilloscope writen in Go
@@ -23,7 +24,7 @@ Run 'goocilloscope COMMAND --help' for more information on a command.
 ```
 As a libray:
 
-```
+```go
 	ctx := context.Background()
 	conn := connector.NewPortAudio(ctx)
 	rd := myrender.NewRender(ctx, 1280, 640, conn)
@@ -33,7 +34,7 @@ As a libray:
 ## Ohters
 serial port default split recive bytes with `:`,you can set your costom data wash callback like this:
 
-```
+```go
 func washData(input []byte) []float32 {
 
 	tmp := strings.Split(string(input), ":")
@@ -50,7 +51,7 @@ conn.SetWashCallback(washData)
 ```
 For implamemt another input source, please see:
 
-```
+```bash
 $REPO/connector/connector.go
 ```
 
