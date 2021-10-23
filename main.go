@@ -24,50 +24,53 @@ func washData(input []byte) []float32 {
 }
 
 func cmdEmulator(cmd *cli.Cmd) {
-	ctx := context.Background()
-	conn := connector.NewEmulator(ctx)
-	rd := myrender.NewRender(ctx, 1280, 640, conn)
-	rd.Start()
+	cmd.Action = func() {
+		ctx := context.Background()
+		conn := connector.NewEmulator(ctx)
+		rd := myrender.NewRender(ctx, 1280, 640, conn)
+		rd.Start()
+	}
 }
 
 func cmdPortAudio(cmd *cli.Cmd) {
-	ctx := context.Background()
-	conn := connector.NewPortAudio(ctx)
-	rd := myrender.NewRender(ctx, 1280, 640, conn)
-	rd.Start()
+	cmd.Action = func() {
+		ctx := context.Background()
+		conn := connector.NewPortAudio(ctx)
+		rd := myrender.NewRender(ctx, 1280, 640, conn)
+		rd.Start()
+	}
 }
 
 func cmdSerial(cmd *cli.Cmd) {
-	cmd.Spec = "PORT_NAME"
+	cmd.Spec = "PORT_NAME... BAUD_RATE"
 	pn := cmd.StringArg("PORT_NAME", "", "The serial port name")
-	cmd.Spec = "BAUD_RATE"
 	br := cmd.StringArg("BAUD_RATE", "", "The serial baud rate")
-	if pn == nil {
-		fmt.Println("PORT_NAME not set, using default value")
+	if pn == nil || br == nil {
+		fmt.Println("PORT_NAME and BAUD_RATE not set, using default value")
 		//"/dev/cu.usbserial-12BP0136"
-	}
-	if br != nil {
-		fmt.Println("BAUD_RATE not set, using default value: 9600")
-		*br = "9600"
+		return
 	}
 	brn, err := strconv.ParseInt(*br, 10, 32)
 	if err != nil {
-		panic(err)
+		return
 	}
 
-	ctx := context.Background()
-	conn := connector.NewSerial(ctx, *pn, int(brn))
-	rd := myrender.NewRender(ctx, 1280, 640, conn)
-	rd.Start()
+	cmd.Action = func() {
+		ctx := context.Background()
+		conn := connector.NewSerial(ctx, *pn, int(brn))
+		rd := myrender.NewRender(ctx, 1280, 640, conn)
+		rd.Start()
+	}
 }
 
 func main() {
 	app := cli.App("goocilloscope", "A simple ocilloscope writen in Go")
-	app.Command("source", "configure command", func(cmd *cli.Cmd) {
-		cmd.Command("emulator", "A sine wave emulator", cmdEmulator)
-		cmd.Command("serial", "A sine wave emulator", cmdSerial)
-		cmd.Command("portaudio", "A sine wave emulator", cmdPortAudio)
 
+	app.Command("source", "need specific a signnal source", func(cmd *cli.Cmd) {
+		cmd.Command("serial", "use a serial input", cmdSerial)
+		cmd.Command("portaudio", "use a audio(microphone) input", cmdPortAudio)
+		cmd.Command("emulator", "A sine wave emulator", cmdEmulator)
 	})
+
 	app.Run(os.Args)
 }
