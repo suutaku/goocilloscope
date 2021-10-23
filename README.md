@@ -6,6 +6,7 @@
 ## Install
 ```
 go get github.com/suutaku/goosilloscope
+go build
 ```
 
 ## Usage
@@ -29,7 +30,7 @@ As a libray:
 	rd.Start()
 ```
 
-## Note
+## Ohters
 serial port default split recive bytes with `:`,you can set your costom data wash callback like this:
 
 ```
@@ -47,7 +48,6 @@ conn := connector.NewSerial(ctx, "/dev/usb-serial", 9600)
 conn.SetWashCallback(washData)
 
 ```
-
 For implamemt another input source, please see:
 
 ```
